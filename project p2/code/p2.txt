@@ -1,0 +1,161 @@
+from pyspark import StorageLevel
+from pyspark.sql import SparkSession
+print('---CREDIT CARD DATA ANALYSIS---')
+while True:
+    df=spark.read.format("csv").option("header","true").load("dbfs:/FileStore/shared_uploads/rohithmsd123@gmail.com/fraudTest-2.csv")
+    s=spark.read.format("csv").option("header","true").load("dbfs:/FileStore/shared_uploads/rohithmsd123@gmail.com/fraudTrain.csv")
+    def printall():
+        s.show()
+        print(s.count())
+        print(df.count())
+        print("disaplying complete dataset")
+
+    def limitedrows():
+        print('Number of customers in dataset',s.count())
+        while True :
+            inp1 = int(input("Enter number from where you want to start viewing the data "))
+            inp2 = int(input("Enter number till where you want to view the data "))
+            op = (inp2+1) - inp1
+            if inp1 >= 1 and inp2 <= s.count() :
+                s.select('*').filter((s["_c0"] >= inp1) & (s["_c0"] <= inp2)).show(op)
+                break
+            else :
+                print("Please enter in the avialable range ")
+                break
+        
+         
+    def setoperation():
+        x=s.select('*')
+        y=df.select('*')
+        z=s.union(y)
+        z.show()
+
+    def filtering():
+        s.filter((s['state'] == 'NC') &  (s['gender'] == "M")).show()
+
+    def filterparticularcity():
+        s.filter(s['city'] == 'Moravian Falls').show()
+
+    def population():
+        s.filter(s['city_pop'] > 1000).show()
+
+    def job():
+        s.filter(s['job'] == 'Nature conservation officer').show()
+
+    def category():
+        s.filter(s['category'] == 'misc_net').show()
+
+    def tofiltercitypopinrange():
+        s.select('_c0','first','last').where(s['city_pop'] .between (500,1000)).show()
+
+    def merchant():
+        s.filter(s['merchant'] == 'fraud_Rippin, Kub and Mann').show()
+
+    def street():
+        s.filter(s['street'] == '561 Perry Cove').show()
+
+    def zipp():
+        s.filter(s['zip'] == '99160').show()
+
+    def dob():
+        #s.filter(s['dob'] == '3/4/1978').select('first','last').show()
+        s.select('first','last').where(s['dob'] == '3/9/1988').show()
+
+    def persist():
+        s.persist(StorageLevel.MEMORY_ONLY)
+        result = df.filter(df['is_fraud'] == 1).show()
+        df.unpersist()
+
+    def latitude():
+        print('to print first and last name and zip of person who lives in latitude of 36.0788')
+        s.select('first','last','zip').distinct().where(s['lat'] == '36.0788').show()
+
+    def genderdistinct():
+        s.select('gender').distinct().show()
+    
+    def joins():
+        s.join(df,s['city_pop'] == df['city_pop'],'outer').show()       
+
+    def isfraud():
+        s.filter(s['is_fraud'] == '1').show()  
+
+
+    print()
+    print('---1.to view  complete dataset--- ')
+    print('---2.to view limited rows as per user required---')
+    print('---3.to perfrom set operation on dataset---')
+    print('---4.to perfrom filter operation on dataset---')
+    print('---5.to perform fiter operation of particular city---')
+    print('---6.to filter based on city population---')
+    print('---7.to get data of particular job nature conservation officer---')
+    print('---8.To filter data of particular category---')
+    print('---9.To disaply distinct gender---')
+    print('---10.To display merchant analysis---')
+    print('---11.To display street analysis---')
+    print('---12.To perform inner joins---')
+    print('---13.To print data of particular ---')
+    print('---14.To display of particular age group---')
+    print('---15.To persist data---')
+    print('---16.To disaply distinct gender---')
+    print('---17.analyzing zip codes---')
+    print('---18.To analyse particular dob---')
+     
+    print('---Enter any number to exit---')
+    choice = int(input('Enter a number to choose to perfrom an action :'))
+    if choice == 1:
+        printall()
+        print('To show complete data set')
+    elif choice == 2:
+        print('To show limited rows')
+        limitedrows()
+    elif choice == 3:
+        setoperation()
+        print('To perform sort operation on dataset')
+    elif choice == 4:
+        filtering()
+        print('To filter dataset')
+    elif choice == 5:
+        filterparticularcity()
+        print("filtering of data of particular city Moravian Falls" )
+    elif choice == 6:
+        print('to filter based on city population')
+        population()
+    elif choice == 7:
+        print("filtering of data of particular job Nature conservation officer")
+        job()
+    elif choice == 8:
+        print("filtering of data based on category")
+        category()
+    elif choice == 9:
+        print("flitering of citypop in range between 500 and 1000 ")
+        tofiltercitypopinrange()
+    elif choice == 10:
+        print('printing merchant analysis')
+        merchant()
+    elif choice == 11:
+        print('printing street analysis')
+        street()
+    elif choice == 12:
+        print('To perform outer joins')
+        joins()  
+    elif choice == 13:
+        latitude()
+        print('to print data of particular latitude')
+    elif choice == 14:
+        print('To display of fraud creditcards')
+        isfraud()
+    elif choice == 15:
+        print('To persist data')
+        persist()
+    elif choice == 16:
+        print('To disaply distinct gender')
+        genderdistinct()
+    elif choice ==17:
+        print("analyzing zip codes")
+        zipp()
+    elif choice == 18:
+        print('dob')
+        dob()
+    else:
+        print('The number you enterted may not exist or please choose in range between from 1 and 18')
+        break
